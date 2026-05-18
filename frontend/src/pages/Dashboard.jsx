@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import AnalyticsCharts from "../components/AnalyticsCharts";
 import {
   collection,
   addDoc,
@@ -19,6 +19,11 @@ import { useNavigate } from "react-router-dom";
 
 import { v4 as uuidv4 } from "uuid";
 
+import Navbar from "../components/Navbar";
+import StatsCard from "../components/StatsCard";
+import FeedbackCard from "../components/FeedbackCard";
+import EmptyState from "../components/EmptyState";
+
 function Dashboard() {
 
   const navigate = useNavigate();
@@ -27,30 +32,43 @@ function Dashboard() {
 
   const [loading, setLoading] = useState(true);
 
-  const [projectName, setProjectName] = useState("");
+  const [projectName, setProjectName] =
+    useState("");
 
-  const [clientName, setClientName] = useState("");
+  const [clientName, setClientName] =
+    useState("");
 
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] =
+    useState([]);
 
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbacks, setFeedbacks] =
+    useState([]);
 
   useEffect(() => {
 
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (currentUser) => {
+    const unsubscribe =
+      onAuthStateChanged(
+        auth,
+        (currentUser) => {
 
-        if (currentUser) {
-          setUser(currentUser);
-          fetchProjects(currentUser.uid);
-        } else {
-          navigate("/");
+          if (currentUser) {
+
+            setUser(currentUser);
+
+            fetchProjects(
+              currentUser.uid
+            );
+
+          } else {
+
+            navigate("/");
+
+          }
+
+          setLoading(false);
+
         }
-
-        setLoading(false);
-      }
-    );
+      );
 
     return () => unsubscribe();
 
@@ -63,31 +81,29 @@ function Dashboard() {
       where("userId", "==", uid)
     );
 
-    const querySnapshot = await getDocs(q);
+    const querySnapshot =
+      await getDocs(q);
 
     let projectArray = [];
 
     querySnapshot.forEach((doc) => {
+
       projectArray.push({
         id: doc.id,
         ...doc.data(),
       });
+
     });
 
     setProjects(projectArray);
 
     fetchFeedbacks(projectArray);
+
   };
-  const copyLink = (id) => {
 
-  navigator.clipboard.writeText(
-    `http://localhost:5173/feedback/${id}`
-  );
-
-  alert("Link Copied");
-
-};
-  const fetchFeedbacks = async (projectArray) => {
+  const fetchFeedbacks = async (
+    projectArray
+  ) => {
 
     let allFeedbacks = [];
 
@@ -95,51 +111,64 @@ function Dashboard() {
 
       const q = query(
         collection(db, "feedbacks"),
-        where("projectId", "==", project.id)
+        where(
+          "projectId",
+          "==",
+          project.id
+        )
       );
 
-      const snapshot = await getDocs(q);
+      const snapshot =
+        await getDocs(q);
 
       snapshot.forEach((doc) => {
+
         allFeedbacks.push({
           id: doc.id,
           ...doc.data(),
         });
+
       });
+
     }
 
     setFeedbacks(allFeedbacks);
+
   };
 
-  const handleCreateProject = async (e) => {
+  const handleCreateProject =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    try {
+      try {
 
-      const feedbackId = uuidv4();
+        const feedbackId =
+          uuidv4();
 
-      await addDoc(collection(db, "projects"), {
+        await addDoc(
+          collection(db, "projects"),
+          {
+            projectName,
+            clientName,
+            userId: user.uid,
+            feedbackId,
+            createdAt: new Date(),
+          }
+        );
 
-        projectName,
-        clientName,
-        userId: user.uid,
-        feedbackId,
-        createdAt: new Date(),
+        setProjectName("");
+        setClientName("");
 
-      });
+        fetchProjects(user.uid);
 
-      setProjectName("");
-      setClientName("");
+      } catch (error) {
 
-      fetchProjects(user.uid);
+        alert(error.message);
 
-    } catch (error) {
+      }
 
-      alert(error.message);
-
-    }
-  };
+    };
 
   const handleLogout = async () => {
 
@@ -149,86 +178,72 @@ function Dashboard() {
 
   };
 
+  const copyLink = (id) => {
+
+    navigator.clipboard.writeText(
+      `http://localhost:5173/feedback/${id}`
+    );
+
+    alert("Link Copied");
+
+  };
+
   if (loading) {
-    return <h1>Loading...</h1>;
+
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+
   }
 
   const averageRating =
     feedbacks.length > 0
       ? (
           feedbacks.reduce(
-            (acc, item) => acc + Number(item.rating),
+            (acc, item) =>
+              acc +
+              Number(item.rating),
             0
           ) / feedbacks.length
         ).toFixed(1)
       : 0;
-  const communicationAverage =
-  feedbacks.length > 0
-    ? (
-        feedbacks.reduce(
-          (acc, item) =>
-            acc + Number(item.communication),
-          0
-        ) / feedbacks.length
-      ).toFixed(1)
-    : 0;
 
   return (
 
     <div className="min-h-screen bg-gray-100">
 
-      {/* Navbar */}
-
-      <div className="bg-white shadow px-8 py-4 flex justify-between items-center">
-
-        <h1 className="text-2xl font-bold">
-          GEMANA
-        </h1>
-
-        <button
-          onClick={handleLogout}
-          className="bg-black text-white px-4 py-2 rounded-lg"
-        >
-          Logout
-        </button>
-
-      </div>
+      <Navbar
+        handleLogout={
+          handleLogout
+        }
+      />
 
       <div className="p-8">
 
         {/* Stats */}
 
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <h2 className="text-gray-500">
-              Total Projects
-            </h2>
+          <StatsCard
+            title="Total Projects"
+            value={projects.length}
+          />
 
-            <p className="text-3xl font-bold mt-2">
-              {projects.length}
-            </p>
-          </div>
+          <StatsCard
+            title="Total Feedbacks"
+            value={feedbacks.length}
+          />
 
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <h2 className="text-gray-500">
-              Total Feedbacks
-            </h2>
-
-            <p className="text-3xl font-bold mt-2">
-              {feedbacks.length}
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <h2 className="text-gray-500">
-              Average Rating
-            </h2>
-
-            <p className="text-3xl font-bold mt-2">
-              {averageRating}
-            </p>
-          </div>
+          <StatsCard
+            title="Average Rating"
+            value={averageRating}
+          />
+          <AnalyticsCharts
+  feedbacks={feedbacks}
+  projects={projects}
+/>
 
         </div>
 
@@ -241,8 +256,10 @@ function Dashboard() {
           </h2>
 
           <form
-            onSubmit={handleCreateProject}
-            className="flex gap-4"
+            onSubmit={
+              handleCreateProject
+            }
+            className="flex flex-col md:flex-row gap-4"
           >
 
             <input
@@ -250,7 +267,9 @@ function Dashboard() {
               placeholder="Project Name"
               value={projectName}
               onChange={(e) =>
-                setProjectName(e.target.value)
+                setProjectName(
+                  e.target.value
+                )
               }
               className="border p-3 rounded-lg w-full"
             />
@@ -260,13 +279,15 @@ function Dashboard() {
               placeholder="Client Name"
               value={clientName}
               onChange={(e) =>
-                setClientName(e.target.value)
+                setClientName(
+                  e.target.value
+                )
               }
               className="border p-3 rounded-lg w-full"
             />
 
             <button
-              className="bg-black text-white px-6 rounded-lg"
+              className="bg-black text-white px-6 py-3 rounded-lg"
             >
               Create
             </button>
@@ -274,6 +295,12 @@ function Dashboard() {
           </form>
 
         </div>
+
+        {/* Empty State */}
+
+        {projects.length === 0 && (
+          <EmptyState />
+        )}
 
         {/* Projects */}
 
@@ -286,40 +313,57 @@ function Dashboard() {
               className="bg-white p-6 rounded-2xl shadow"
             >
 
-              <div className="flex justify-between">
+              <div className="flex justify-between items-start">
 
                 <div>
 
                   <h2 className="text-2xl font-bold">
-                    {project.projectName}
+                    {
+                      project.projectName
+                    }
                   </h2>
 
                   <p className="text-gray-500 mt-1">
-                    Client: {project.clientName}
+                    Client:
+                    {" "}
+                    {
+                      project.clientName
+                    }
                   </p>
 
                 </div>
 
               </div>
 
+              {/* Feedback Link */}
+
               <div className="mt-4 p-4 bg-gray-100 rounded-lg">
 
                 <p className="font-medium">
                   Feedback Link
                 </p>
-                
-                <p className="text-sm text-gray-600 mt-1">
+
+                <p className="text-sm text-gray-600 mt-1 break-all">
                   http://localhost:5173/feedback/
-                  {project.feedbackId}
+                  {
+                    project.feedbackId
+                  }
                 </p>
+
                 <button
-  onClick={() => copyLink(project.feedbackId)}
-  className="mt-3 bg-black text-white px-4 py-2 rounded-lg"
->
-  Copy Link
-</button>
+                  onClick={() =>
+                    copyLink(
+                      project.feedbackId
+                    )
+                  }
+                  className="mt-3 bg-black text-white px-4 py-2 rounded-lg"
+                >
+                  Copy Link
+                </button>
 
               </div>
+
+              {/* Feedbacks */}
 
               <div className="mt-6">
 
@@ -330,30 +374,29 @@ function Dashboard() {
                 {feedbacks
                   .filter(
                     (fb) =>
-                      fb.projectId === project.id
+                      fb.projectId ===
+                      project.id
+                  )
+                  .length === 0 && (
+
+                  <p className="text-gray-500">
+                    No feedback yet
+                  </p>
+
+                )}
+
+                {feedbacks
+                  .filter(
+                    (fb) =>
+                      fb.projectId ===
+                      project.id
                   )
                   .map((fb) => (
 
-                    <div
+                    <FeedbackCard
                       key={fb.id}
-                      className="border rounded-xl p-4 mb-3"
-                    >
-
-                      <p>
-                        ⭐ Rating: {fb.rating}
-                      </p>
-
-                      <p>
-                        💬 Communication:
-                        {" "}
-                        {fb.communication}
-                      </p>
-
-                      <p className="mt-2 text-gray-700">
-                        {fb.review}
-                      </p>
-
-                    </div>
+                      fb={fb}
+                    />
 
                   ))}
 
