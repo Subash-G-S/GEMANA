@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import AuthLayout from "../components/AuthLayout";
+import { Link } from "react-router-dom";
 import {
   doc,
   setDoc,
@@ -50,38 +52,71 @@ function Signup() {
 
   return (
     <div>
-      <h1>Signup</h1>
+      <AuthLayout
+  title="Create Account"
+  subtitle="Start building your freelancer reputation."
+>
 
-      <form onSubmit={handleSignup}>
-        <input
-  type="text"
-  placeholder="Full Name"
-  onChange={(e) =>
-    setName(e.target.value)
-  }
-/>
+  <form
+    onSubmit={handleSignup}
+    className="space-y-5"
+  >
 
-<input
-  type="text"
-  placeholder="Username"
-  onChange={(e) =>
-    setUsername(e.target.value)
-  }
-/>
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+    <input
+      type="text"
+      placeholder="Full Name"
+      onChange={(e) =>
+        setName(e.target.value)
+      }
+      className="w-full border border-gray-300 rounded-2xl p-4 outline-none focus:border-black"
+    />
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+    <input
+      type="text"
+      placeholder="Username"
+      onChange={(e) =>
+        setUsername(e.target.value)
+      }
+      className="w-full border border-gray-300 rounded-2xl p-4 outline-none focus:border-black"
+    />
 
-        <button type="submit">Create Account</button>
-      </form>
+    <input
+      type="email"
+      placeholder="Email"
+      onChange={(e) =>
+        setEmail(e.target.value)
+      }
+      className="w-full border border-gray-300 rounded-2xl p-4 outline-none focus:border-black"
+    />
+
+    <input
+      type="password"
+      placeholder="Password"
+      onChange={(e) =>
+        setPassword(e.target.value)
+      }
+      className="w-full border border-gray-300 rounded-2xl p-4 outline-none focus:border-black"
+    />
+
+    <button
+      type="submit"
+      className="w-full bg-black text-white py-4 rounded-2xl font-semibold hover:scale-[1.01] transition-all"
+    >
+      Create Account
+    </button>
+    <p className="text-center text-gray-500 pt-2" >
+      Already have an account?
+
+  <Link
+    to="/"
+    className="text-black font-semibold ml-2 hover:underline"
+  >
+    Login
+  </Link>
+    </p>
+  </form>
+
+</AuthLayout>
     </div>
   );
 }

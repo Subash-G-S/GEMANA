@@ -2,7 +2,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
-
+import AuthLayout from "../components/AuthLayout";
 function Login() {
   const navigate = useNavigate();
 
@@ -23,27 +23,57 @@ function Login() {
 
   return (
     <div>
-      <h1>Login</h1>
+      
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <AuthLayout
+  title="Welcome Back"
+  subtitle="Login to access your dashboard."
+>
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+  <form
+    onSubmit={handleLogin}
+    className="space-y-5"
+  >
 
-        <button type="submit">Login</button>
-      </form>
+    <input
+      type="email"
+      placeholder="Email"
+      onChange={(e) =>
+        setEmail(e.target.value)
+      }
+      className="w-full border border-gray-300 rounded-2xl p-4 outline-none focus:border-black"
+    />
 
-      <p>
-        Don't have account? <Link to="/signup">Signup</Link>
-      </p>
+    <input
+      type="password"
+      placeholder="Password"
+      onChange={(e) =>
+        setPassword(e.target.value)
+      }
+      className="w-full border border-gray-300 rounded-2xl p-4 outline-none focus:border-black"
+    />
+
+    <button
+      type="submit"
+      className="w-full bg-black text-white py-4 rounded-2xl font-semibold hover:scale-[1.01] transition-all"
+    >
+      Login
+    </button>
+    <p className="text-center text-gray-500 pt-2" >
+      Dont have an account?
+
+  <Link
+    to="/signup"
+    className="text-black font-semibold ml-2 hover:underline"
+  >
+    Signup
+  </Link>
+    </p>
+  </form>
+
+</AuthLayout>
+
+      
     </div>
   );
 }
