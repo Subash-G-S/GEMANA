@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
+import toast from "react-hot-toast";
 function Login() {
   const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ function Login() {
     } catch (error) {
       alert(error.message);
     }
+    toast.success("Welcome back !");
   };
 
   return (

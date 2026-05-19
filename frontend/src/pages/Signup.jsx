@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import AuthLayout from "../components/AuthLayout";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   doc,
   setDoc,
@@ -41,11 +42,11 @@ function Signup() {
     }
   );
 
-  alert("Account Created");
+  toast.success("Account Created");
 
 } catch (error) {
 
-  alert(error.message);
+  toast.error(error.message);
 
 }
   };

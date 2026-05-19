@@ -1,28 +1,51 @@
-function Navbar({ handleLogout }) {
+import { useNavigate } from "react-router-dom";
+
+function Navbar({
+  handleLogout,
+  username,
+}) {
+
+  const navigate =
+    useNavigate();
 
   return (
 
-    <div className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+    <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-5 flex justify-between items-center sticky top-0 z-50">
 
-      <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+      <div>
 
-        <div>
+        <h1 className="text-3xl font-black">
+          GEMANA
+        </h1>
 
-          <h1 className="text-3xl font-black tracking-tight">
-            GEMANA
-          </h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Freelancer Reputation Platform
+        </p>
 
-          <p className="text-sm text-gray-500 mt-1">
-            Freelancer Reputation Platform
-          </p>
+      </div>
 
-        </div>
+      <div className="flex flex-wrap gap-3">
+
+        <button
+          onClick={() =>
+            navigate(
+              `/profile/${username}`
+            )
+          }
+          className="border border-black px-5 py-3 rounded-2xl hover:bg-gray-100 transition"
+        >
+
+          Profile
+
+        </button>
 
         <button
           onClick={handleLogout}
-          className="bg-black text-white px-5 py-3 rounded-2xl hover:scale-[1.03] transition-all"
+          className="bg-black text-white px-5 py-3 rounded-2xl hover:opacity-90 transition"
         >
+
           Logout
+
         </button>
 
       </div>
